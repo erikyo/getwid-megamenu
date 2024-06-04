@@ -1,5 +1,4 @@
 import { SVG } from '@wordpress/primitives';
-import { Path } from '@wordpress/components';
 
 export const CHILDREN_ICON = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104.9 122.88">

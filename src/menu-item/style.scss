@@ -160,7 +160,7 @@ $mq__responsive_breakpoint: $mq__smaller-than-tablet;
 			align-items: center;
 			justify-content: center;
 			overflow: hidden;
-			transition: 350ms transform, 100ms opacity;
+			transition: 350ms transform, 100ms opacity 0.05s;
 			box-shadow: inherit;
 
 			.wp-block-megamenu-menu {
@@ -186,7 +186,7 @@ $mq__responsive_breakpoint: $mq__smaller-than-tablet;
 			opacity: 0;
 			transform: translateX(-100%);
 			background: var(--megamenu--background-color, #fff);
-			transition: 350ms transform, 100ms opacity;
+			transition: 350ms transform, 100ms opacity 0.05s;
 		}
 
 		// the megamenu is opened
@@ -214,6 +214,10 @@ $mq__responsive_breakpoint: $mq__smaller-than-tablet;
 
 		.vsge-product-categories .vsge-product-categories-list-item.has-children.is-opened {
 
+			li {
+				padding-left: 0;
+			}
+
 			> .vsge-product-categories-list--depth-1 {
 				transform: translateX(0);
 				opacity: 1;
@@ -240,5 +244,21 @@ $mq__responsive_breakpoint: $mq__smaller-than-tablet;
 		.wp-block-megamenu-item {
 			width: 100%;
 		}
+	}
+}
+
+/**
+ * Fix: hide the submenu until the menu is full initialized
+ */
+.wp-block-megamenu {
+	&.is-initialized {
+		.wp-block-megamenu-item__dropdown,
+		.show-on.mobile{
+			display: block;
+		}
+	}
+	.wp-block-megamenu-item__dropdown,
+	.show-on.mobile {
+		display: none;
 	}
 }

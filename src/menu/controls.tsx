@@ -3,17 +3,14 @@ import {
 	RangeControl,
 	SelectControl,
 	ToggleControl,
+	Toolbar,
 	ToolbarButton,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
-import {
-	alignLeft,
-	alignCenter,
-	alignRight,
-} from '@wordpress/icons';
+import { alignLeft, alignCenter, alignRight } from '@wordpress/icons';
 
 /**
  * The Megamenu editor controls
@@ -23,12 +20,32 @@ import {
  * @param args.attributes
  * @param args.showResponsiveMenu
  * @param args.setShowResponsiveMenu
+ * @param args.attributes.menusMinWidth
+ * @param args.attributes.activator
+ * @param args.attributes.expandDropdown
+ * @param args.attributes.collapseOnMobile
+ * @param args.attributes.responsiveBreakpoint
+ * @param args.attributes.dropdownMaxWidth
+ * @param args.attributes.align
  */
 export function Controls( {
 	setAttributes,
 	attributes,
 	showResponsiveMenu,
 	setShowResponsiveMenu,
+}: {
+	setAttributes: Function;
+	attributes: {
+		menusMinWidth: number;
+		activator: string;
+		expandDropdown: boolean;
+		collapseOnMobile: boolean;
+		responsiveBreakpoint: number;
+		dropdownMaxWidth: number;
+		align: string;
+	};
+	showResponsiveMenu: boolean;
+	setShowResponsiveMenu: Function;
 } ): JSX.Element {
 	function expandDropdown( doExpand ) {
 		setAttributes( {
@@ -45,27 +62,29 @@ export function Controls( {
 	return (
 		<>
 			<BlockControls>
-				<ToolbarButton
-					icon={ alignLeft }
-					label="Left"
-					title={ __( 'Justify items left' ) }
-					isActive={ 'left' === attributes.align }
-					onClick={ () => setAlignment( 'left' ) }
-				/>
-				<ToolbarButton
-					icon={ alignCenter }
-					label="Center"
-					title={ __( 'Justify items center' ) }
-					isActive={ 'center' === attributes.align }
-					onClick={ () => setAlignment( 'center' ) }
-				/>
-				<ToolbarButton
-					icon={ alignRight }
-					label="Right"
-					title={ __( 'Justify items right' ) }
-					isActive={ 'right' === attributes.align }
-					onClick={ () => setAlignment( 'right' ) }
-				/>
+				<Toolbar label="Options">
+					<ToolbarButton
+						icon={ alignLeft }
+						label="Left"
+						title={ __( 'Justify items left' ) }
+						isActive={ 'left' === attributes.align }
+						onClick={ () => setAlignment( 'left' ) }
+					/>
+					<ToolbarButton
+						icon={ alignCenter }
+						label="Center"
+						title={ __( 'Justify items center' ) }
+						isActive={ 'center' === attributes.align }
+						onClick={ () => setAlignment( 'center' ) }
+					/>
+					<ToolbarButton
+						icon={ alignRight }
+						label="Right"
+						title={ __( 'Justify items right' ) }
+						isActive={ 'right' === attributes.align }
+						onClick={ () => setAlignment( 'right' ) }
+					/>
+				</Toolbar>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody

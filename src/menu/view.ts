@@ -1,5 +1,4 @@
-import './style.scss';
-import MegaMenu from './MegaMenu';
+import MegaMenu from './megaMenu';
 
 /* The code is adding an event listener to the `DOMContentLoaded` event, which is fired when the
 initial HTML document has been completely loaded and parsed. When this event is triggered, the code

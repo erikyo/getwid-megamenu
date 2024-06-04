@@ -10,20 +10,17 @@ import {
 	Popover,
 	TextControl,
 	ToggleControl,
+	Toolbar,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-
-/**
- * WordPress dependencies
- */
-import { escape } from 'lodash';
+import { escapeHtml } from '../utils';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 
-function Controls( args ) {
+function Controls( props ) {
 	const { attributes, setAttributes, toggleItemDropdown, hasDescendants } =
-		args;
+		props;
 
 	const { linkTarget, rel, text, url } = attributes;
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
@@ -44,7 +41,7 @@ function Controls( args ) {
 	};
 
 	const onToggleOpenInNewTab = useCallback(
-		( value ) => {
+		( value: boolean ) => {
 			const newLinkTarget = value ? '_blank' : undefined;
 
 			let updatedRel = rel;
@@ -63,7 +60,7 @@ function Controls( args ) {
 	);
 
 	const onSetLinkRel = useCallback(
-		( value ) => {
+		( value: string ) => {
 			setAttributes( { rel: value } );
 		},
 		[ setAttributes ]
@@ -72,7 +69,7 @@ function Controls( args ) {
 	return (
 		<>
 			<BlockControls>
-				<ToolbarGroup>
+				<Toolbar label="Options">
 					<ToolbarButton
 						icon="admin-links"
 						title={ __( 'Edit Link' ) }
@@ -85,17 +82,17 @@ function Controls( args ) {
 						onClick={ unlinkItem }
 						isDisabled={ ! isURLSet }
 					/>
-				</ToolbarGroup>
-				{ ! hasDescendants && (
-					<ToolbarGroup>
-						<ToolbarButton
-							icon={ 'download' }
-							className={ hasDescendants ? 'is-active' : '' }
-							title={ __( 'Add submenu' ) }
-							onClick={ toggleItemDropdown }
-						/>
-					</ToolbarGroup>
-				) }
+					{ ! hasDescendants && (
+						<ToolbarGroup>
+							<ToolbarButton
+								icon={ 'download' }
+								className={ hasDescendants ? 'is-active' : '' }
+								title={ __( 'Add submenu' ) }
+								onClick={ toggleItemDropdown }
+							/>
+						</ToolbarGroup>
+					) }
+				</Toolbar>
 			</BlockControls>
 			{ isURLPickerOpen && (
 				<Popover
@@ -110,7 +107,7 @@ function Controls( args ) {
 						onChange={ ( {
 							title: newTitle = '',
 							url: newURL = '',
-							opensInNewTab: newOpensInNewTab,
+							opensInNewTab: newOpensInNewTab = false,
 							id: newId = '',
 							kind: newKind = '',
 						} ) => {
@@ -126,7 +123,7 @@ function Controls( args ) {
 										newTitle !== '' &&
 										text !== newTitle
 									) {
-										return escape( newTitle );
+										return escapeHtml( newTitle );
 									}
 								} )(),
 							} );

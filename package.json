@@ -1,32 +1,62 @@
 {
-  "name": "megamenu-block",
-  "version": "1.0.0",
-  "description": "WordPress Mega Menu Block",
-  "authors": [
-    "MotoPress",
-    "erikyo"
-  ],
-  "license": "GPL-2.0-or-later",
-  "devDependencies": {
-    "@types/lodash": "^4.14.202",
-    "@wordpress/block-editor": "^12.15.0",
-    "@wordpress/blocks": "^12.16.0",
-    "@wordpress/components": "^25.5.0",
-    "@wordpress/compose": "^6.16.0",
-    "@wordpress/data": "^9.9.0",
-    "@wordpress/element": "^5.16.0",
-    "@wordpress/i18n": "^4.39.0",
-    "@wordpress/scripts": "^26.10.0",
-    "classnames": "^2.3.2",
-    "lodash": "^4.17.21"
-  },
-  "scripts": {
-    "start": "wp-scripts start",
-    "build": "wp-scripts build",
-    "format:js": "wp-scripts format-js",
-    "lint:js": "wp-scripts lint-js"
-  },
-  "browserslist": [
-    "extends @wordpress/browserslist-config"
-  ]
+	"name": "megamenu-block",
+	"version": "1.0.0",
+	"description": "WordPress Mega Menu Block",
+	"authors": [
+		"MotoPress",
+		"erikyo"
+	],
+	"license": "GPL-2.0-or-later",
+	"devDependencies": {
+		"@types/wordpress__block-editor": "^11.5.14",
+		"@types/wordpress__blocks": "^12.5.14",
+		"@types/wordpress__compose": "^6.1.0",
+		"@types/wordpress__element": "^2.14.1",
+		"@wordpress/block-editor": "^13.0.0",
+		"@wordpress/blocks": "^13.0.0",
+		"@wordpress/components": "^28.0.0",
+		"@wordpress/compose": "^7.0.0",
+		"@wordpress/data": "^10.0.0",
+		"@wordpress/element": "^6.0.0",
+		"@wordpress/i18n": "^5.0.0",
+		"@wordpress/prettier-config": "^4.0.0",
+		"@wordpress/scripts": "27.9.0",
+		"@wordpress/stylelint-config": "^22.0.0",
+		"@wp-blocks/make-pot": "^1.3.2",
+		"classnames": "^2.5.1"
+	},
+	"dependencies": {
+		"@wordpress/icons": "^10.0.0"
+	},
+	"scripts": {
+		"start": "wp-scripts start",
+		"build": "npm run build:scripts && npm run build:makepot",
+		"build:scripts": "wp-scripts build",
+		"build:makepot": "npx @wp-blocks/make-pot",
+		"build:zip": "wp-scripts build zip",
+		"format:js": "wp-scripts format-js",
+		"lint:js": "wp-scripts lint-js"
+	},
+	"browserslist": [
+		"extends @wordpress/browserslist-config"
+	],
+	"engines": {
+		"node": ">=14.0.0",
+		"npm": ">=6.9.0"
+	},
+	"eslintConfig": {
+		"extends": [
+			"plugin:@wordpress/eslint-plugin/recommended"
+		],
+		"env": {
+			"browser": true,
+			"node": true
+		},
+		"globals": {
+			"window": true,
+			"document": true,
+			"localStorage": true
+		}
+	},
+	"prettier": "@wordpress/prettier-config"
 }

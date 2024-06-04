@@ -1,0 +1,13 @@
+/**
+ * The following CSS code is used to disable scrolling on the body element and apply
+ * transformations to the body and megamenu elements.
+ * We use this to prevent the user from scrolling while the menu is open.
+ */
+body.no-scroll {
+	height: 100vh;
+	height: -webkit-fill-available;
+	width: 100%;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+}

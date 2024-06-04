@@ -69,7 +69,7 @@ export function removeStyles( el: HTMLElement, stylesToRemove: string[] ) {
  * breakpoint.
  */
 export function isMobile( breakpoint: number ): boolean {
-	return document.body.clientWidth < breakpoint;
+	return breakpoint !== 0 && document.body.clientWidth < breakpoint;
 }
 
 /**
@@ -103,4 +103,25 @@ export function disableBodyScroll( scrollDisabled = false ) {
 		window.scrollTo( { top: scrollTop } );
 		document.body.removeAttribute( 'data-scroll-top' );
 	}
+}
+
+/**
+ * Converts the characters "&", "<", ">", '"', and "'" in a string to their corresponding HTML entities.
+ *
+ * @param inputString The string to be converted.
+ * @return The converted string with special characters replaced by HTML entities.
+ */
+export function escapeHtml( inputString: string ): string {
+	const htmlEntities: Record< string, string > = {
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;',
+		'"': '&quot;',
+		"'": '&apos;',
+	};
+
+	// Regular expression to match any of the special characters
+	const regex = /[&<>"']/g;
+
+	return inputString.replace( regex, ( match ) => htmlEntities[ match ] );
 }

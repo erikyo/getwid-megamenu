@@ -1,14 +1,12 @@
-import { registerBlockType } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
+import { BlockAttributes, registerBlockType } from '@wordpress/blocks';
 
-import metadata from '../megamenu.json';
-import save from './save';
-import edit from './edit';
+import metadata from './block.json';
+const blockdata = metadata as BlockAttributes;
+import Save from './Save';
+import Edit from './Edit';
+import './style.scss';
 
-registerBlockType( metadata.name, {
-	...metadata,
-	title: __( 'Mega Menu', 'megamenu' ),
-	keywords: [ __( 'navigation', 'megamenu' ), __( 'links', 'megamenu' ) ],
-	edit,
-	save,
+registerBlockType( blockdata.name, {
+	edit: Edit,
+	save: Save,
 } );

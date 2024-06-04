@@ -4,7 +4,17 @@
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 import classnames from 'classnames';
 
-export default function save( { attributes } ): JSX.Element {
+export default function save( {
+	attributes,
+}: {
+	attributes: {
+		activator: string;
+		expandDropdown: boolean;
+		collapseOnMobile: boolean;
+		responsiveBreakpoint: number;
+		dropdownMaxWidth: number;
+	};
+} ): JSX.Element {
 	const saveBlockProps = useBlockProps.save( {
 		className: classnames( 'wp-block-megamenu__content' ),
 	} );

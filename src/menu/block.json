@@ -34,7 +34,7 @@
             "type": "number",
             "default": 1023
         }
-    },
+	},
 	"supports": {
 		"align": true,
 		"className": true,
@@ -50,6 +50,16 @@
 		"spacing": {
 			"margin": true,
 			"padding": true
+		},
+		"dimensions": {
+			"width": true,
+			"minHeight": false
+		},
+		"position": {
+			"sticky": true
+		},
+		"shadow": {
+			"__experimentalSkipSerialization": true
 		},
 		"typography": {
 			"fontSize": true,
@@ -67,5 +77,9 @@
 		},
 		"reusable": false,
 		"lightBlockWrapper": false
-	}
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css",
+	"editorStyle": "file:./style-editor.css",
+	"script": "file:./view.js"
 }

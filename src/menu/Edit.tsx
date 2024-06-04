@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 /**
  * WordPress dependencies
@@ -9,8 +8,10 @@ import { compose } from '@wordpress/compose';
 import { useRef, useState } from '@wordpress/element';
 import classnames from 'classnames';
 import { Controls } from './controls';
-import { InnerBlocks } from '@wordpress/block-editor';
+import { InnerBlocks, useInnerBlocksProps } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
+import type { Template } from '@wordpress/blocks';
+import { withSelect } from '@wordpress/data';
 
 const TEMPLATE = [
 	[
@@ -24,7 +25,7 @@ const TEMPLATE = [
 		},
 		[ [ 'megamenu/menu-item', {} ] ],
 	],
-];
+] as Template[];
 
 const ALLOWED_BLOCKS = [
 	'megamenu/menu-item',
@@ -43,11 +44,10 @@ function MegaMenu( args ) {
 	} = args;
 
 	const [ showResponsiveMenu, setShowResponsiveMenu ] = useState( false );
-
-	const ref = useRef();
+	const ref = useRef( null );
 
 	return (
-		<>
+		<div>
 			<Controls
 				{ ...args }
 				showResponsiveMenu={ showResponsiveMenu }
@@ -70,7 +70,6 @@ function MegaMenu( args ) {
 			>
 				<div className={ 'wp-block-megamenu__content' }>
 					<InnerBlocks
-						parentData={ attributes }
 						ref={ ref }
 						template={ TEMPLATE }
 						templateLock={ false }
@@ -80,10 +79,9 @@ function MegaMenu( args ) {
 							( isImmediateParentOfSelectedBlock &&
 								! selectedBlockHasDescendants ) ||
 							isSelected
-								? InnerBlocks.DefaultAppender
-								: false
+								? InnerBlocks.DefaultBlockAppender
+								: undefined
 						}
-						__experimentalMoverDirection="horizontal"
 						orientation="horizontal"
 					/>
 				</div>
@@ -101,37 +99,28 @@ function MegaMenu( args ) {
 					<div></div>
 				</Button>
 			</div>
-		</>
+		</div>
 	);
 }
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		// get the selected block attributes
 		const {
 			getClientIdsOfDescendants,
 			hasSelectedInnerBlock,
 			getSelectedBlockClientId,
 			getBlocksByClientId,
 		} = select( 'core/block-editor' );
-		// check if the selected block is an immediate parent
 		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
 			clientId,
 			false
 		);
-
-		// get the selected block client id
 		const selectedBlockId = getSelectedBlockClientId();
-
-		// check if the selected block has descendants
 		const selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
 			selectedBlockId,
 		] )?.length;
-
-		// get the menu items
 		const menuItems = getBlocksByClientId( clientId )[ 0 ].innerBlocks;
 
-		// returns the menu item data for the selected block
 		return {
 			isImmediateParentOfSelectedBlock,
 			selectedBlockHasDescendants,

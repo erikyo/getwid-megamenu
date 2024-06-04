@@ -26,6 +26,9 @@
 		"linkTarget": {
 			"type": "string"
 		},
+		"opensInNewTab": {
+			"type": "boolean"
+		},
 		"rel": {
 			"type": "string"
 		},
@@ -57,7 +60,13 @@
 			"padding": true
 		},
 		"dimensions": {
-			"minHeight": true
+			"minHeight": false
+		},
+		"position": {
+			"sticky": true
+		},
+		"shadow": {
+			"__experimentalSkipSerialization": true
 		},
 		"typography": {
 			"fontSize": true,
@@ -74,5 +83,7 @@
 			}
 		},
 		"__experimentalSelector": ".wp-block-megamenu-item"
-	}
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css"
 }

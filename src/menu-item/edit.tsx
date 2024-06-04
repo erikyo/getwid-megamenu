@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	RichText,
 	InnerBlocks,
-	store as blockEditorStore,
+	store as blockEditorStore, useBlockProps,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -40,22 +40,29 @@ function Edit( props ) {
 		parentAttributes,
 	} = props;
 
-	const { text } = attributes;
+	const { text, url, linkTarget, rel } = attributes;
 
 	// TODO: handle with effect
 	const menuItemHasChildrens = hasDescendants;
 
+	const linkProps = {
+		...( linkTarget && { target: linkTarget } ),
+		...( rel && { rel } ),
+	};
+
 	// the menu item ref
-	const menuItemRef = useRef< HTMLDivElement >( null );
-	const dropdownRef = useRef< HTMLDivElement >( null );
+	const menuItemRef = useRef< HTMLDivElement | null >( null );
+	const dropdownRef = useRef< HTMLDivElement | null >( null );
 
 	// Enhanced withDispatch function
-	const enhancedUpdateInnerBlocks = () => {
-		const block = createBlock('core/group', {
+	const block = () => {
+		const newBlock = createBlock( 'core/group', {
 			className: 'dropdown-inner',
 			layout: { type: 'constrained' },
-		});
-		props.dispatch(blockEditorStore).insertBlock(block, undefined, props.clientId);
+		} );
+		props
+			.dispatch( blockEditorStore )
+			.insertBlock( newBlock, undefined, props.clientId );
 	};
 
 	const [ showDropdown, setShowDropdown ] = useState( false );
@@ -107,11 +114,12 @@ function Edit( props ) {
 	};
 
 	useEffect( () => {
-		if (isSelected === true)	{
+		if ( isSelected === true ) {
 			updateDropdownPosition();
 			setParentAttributes();
 			setShowDropdown(
-				( isSelected === true || isParentOfSelectedBlock === true ) && menuItemHasChildrens
+				( isSelected === true || isParentOfSelectedBlock === true ) &&
+					menuItemHasChildrens
 			);
 		}
 	}, [ isSelected ] );
@@ -120,20 +128,17 @@ function Edit( props ) {
 		const blockNode: HTMLElement | null = menuItemRef.current;
 
 		if ( blockNode ) {
-			blockNode.ownerDocument.defaultView.addEventListener(
+			blockNode.ownerDocument.defaultView?.addEventListener(
 				'resize',
 				updateDropdownPosition
 			);
 		}
 	}, [] );
 
+	const blockProps = useBlockProps( );
+
 	return (
 		<>
-			<Controls
-				{ ...props }
-				toggleItemDropdown={ addMenuItemDropdown }
-				hasDescendants={ menuItemHasChildrens }
-			/>
 			<div
 				className={ classnames( 'wp-block-megamenu-item', {
 					'has-children': menuItemHasChildrens,
@@ -142,6 +147,7 @@ function Edit( props ) {
 				ref={ menuItemRef }
 			>
 				<a
+					{ ...linkProps }
 					className={ 'wp-block-megamenu-item__link' }
 					style={ {
 						minWidth: parentAttributes.menusMinWidth
@@ -159,10 +165,13 @@ function Edit( props ) {
 							onChange={ ( value ) =>
 								setAttributes( { text: value } )
 							}
-							withoutInteractiveFormatting
+							{ ...blockProps }
 							onReplace={ onReplace }
 							onMerge={ mergeBlocks }
-							identifier="text"
+							identifier="content"
+							tagName="span"
+							withoutInteractiveFormatting
+							preserveWhiteSpace
 						/>
 					</span>
 					{ menuItemHasChildrens ? (
@@ -192,11 +201,16 @@ function Edit( props ) {
 					<InnerBlocks />
 				</div>
 			</div>
+			<Controls
+				{ ...props }
+				toggleItemDropdown={ addMenuItemDropdown }
+				hasDescendants={ menuItemHasChildrens }
+			/>
 		</>
 	);
 }
 
-const InnerEdit = compose( [
+export default compose( [
 	withSelect( ( select, ownProps ) => {
 		const {
 			hasSelectedInnerBlock,
@@ -207,10 +221,10 @@ const InnerEdit = compose( [
 		const { clientId } = ownProps;
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 		const hasDescendants = !! getBlockCount( clientId );
-		const rootBlockClientId = getBlockParentsByBlockName( clientId, [
-			'megamenu/menu',
-			'core/navigation',
-		] )[ 0 ];
+		const rootBlockClientId = getBlockParentsByBlockName(
+			clientId,
+			'megamenu/menu'
+		)[ 0 ];
 
 		const parentBlock = getBlock( rootBlockClientId );
 		const parentAttributes = parentBlock.attributes;
@@ -225,18 +239,12 @@ const InnerEdit = compose( [
 	withDispatch( ( dispatch, { clientId } ) => {
 		return {
 			updateInnerBlocks() {
-				const block = createBlock( 'core/group', {
-					className: 'dropdown-inner',
-					layout: { type: 'constrained' },
-				} );
-				dispatch( blockEditorStore ).insertBlock(
-					block,
-					undefined,
-					clientId
+				dispatch( 'core/block-editor' ).replaceInnerBlocks(
+					clientId,
+					[],
+					false
 				);
 			},
 		};
 	} ),
 ] as any )( Edit );
-
-export default InnerEdit;

@@ -5,8 +5,8 @@ import {
 	isMobile,
 	removeStyles,
 	setNewPosition,
-} from './utils';
-import { TIMEOUT } from './utils/constants';
+} from '../utils';
+import { TIMEOUT } from '../utils/constants';
 
 export default class MegaMenu {
 	private megamenu: HTMLElement;
@@ -55,7 +55,9 @@ export default class MegaMenu {
 	 */
 	init() {
 		// Return immediately if the  megamenu has no content.
-		if ( ! this.megamenu.childNodes.length ) return;
+		if ( ! this.megamenu.childNodes.length ) {
+			return;
+		}
 
 		// Attach the window/responsive related events to the megamenu
 		this.updateResponsiveMenu();
@@ -193,7 +195,9 @@ export default class MegaMenu {
 			}
 
 			/* Avoid focus out the menu on mobile devices */
-			if ( isResponsive ) return;
+			if ( isResponsive ) {
+				return;
+			}
 
 			/* Handle mouse leave */
 			menuItem.onmouseleave = ( ev: MouseEvent ) => {
@@ -269,7 +273,9 @@ export default class MegaMenu {
 		event.stopImmediatePropagation();
 
 		// the menu item, in case of root menu item fallbacks to wp-block-megamenu-item
-		const menuItem = target.classList.contains( 'has-children' )
+		const menuItem: HTMLElement | null = target.classList.contains(
+			'has-children'
+		)
 			? target
 			: target.closest( '.has-children' );
 
@@ -278,90 +284,115 @@ export default class MegaMenu {
 		) as HTMLButtonElement;
 
 		if ( event.type === 'click' || event.type === 'mouseenter' ) {
-			// the current menu level
-			this.menuLevel( this.currentLevel + 1 );
-
-			// get all the parent elements that are opened and close them
-			menuItem?.parentElement
-				?.querySelectorAll( '.is-opened' )
-				.forEach( ( el ) => {
-					el.classList.remove( 'is-opened' );
-					el.classList.remove( 'is-left' );
-				} );
-			menuItem?.classList.add( 'is-opened' );
-			menuItem?.classList.remove( 'is-left' );
-			toggleButton.classList.add( 'is-back' );
+			this.openMenuItemHelper( menuItem, toggleButton );
 		} else if ( event.type === 'mouseleave' ) {
-			this.menuLevel( 0 );
-			menuItem?.classList.remove( 'is-opened' );
-			toggleButton.classList.remove( 'is-back' );
+			this.closeMenuItemHelper( menuItem, toggleButton );
 		}
+	}
+
+	/**
+	 * Helper function to open a menu item.
+	 *
+	 * @param {HTMLElement|null}  menuItem     - The menu item to be opened.
+	 * @param {HTMLButtonElement} toggleButton - The toggle button element.
+	 */
+	openMenuItemHelper(
+		menuItem: HTMLElement | null,
+		toggleButton: HTMLButtonElement
+	) {
+		this.menuLevel( this.currentLevel + 1 );
+
+		const parentElements =
+			menuItem?.parentElement?.querySelectorAll( '.is-opened' );
+		if ( parentElements ) {
+			parentElements.forEach( ( el ) => {
+				el.classList.remove( 'is-opened' );
+				el.classList.remove( 'is-left' );
+			} );
+		}
+
+		menuItem?.classList.add( 'is-opened' );
+		menuItem?.classList.remove( 'is-left' );
+		toggleButton.classList.add( 'is-back' );
+	}
+
+	/**
+	 * Helper function to close a menu item.
+	 *
+	 * @param {HTMLElement|null}  menuItem     - The menu item to be closed.
+	 * @param {HTMLButtonElement} toggleButton - The toggle button element.
+	 */
+	closeMenuItemHelper(
+		menuItem: HTMLElement | null,
+		toggleButton: HTMLButtonElement
+	) {
+		this.menuLevel( 0 );
+		menuItem?.classList.remove( 'is-opened' );
+		toggleButton.classList.remove( 'is-back' );
 	}
 
 	/**
 	 * The function sets the position and width of dropdown menus based on the width of the parent menu
 	 * element.
 	 */
-	updateDropdownsPosition() {
-		// check if current device is under the menu breakpoint
+	/**
+	 * The function sets the position and width of dropdown menus based on the width of the parent menu
+	 * element.
+	 */
+	async updateDropdownsPosition() {
 		const breakpoint = Number( this.megamenu.dataset.responsiveBreakpoint );
 		if ( isMobile( breakpoint ) ) {
 			this.menuItems.forEach( ( menuItem ) => {
-				const dropdown: HTMLElement | null = menuItem.querySelector(
+				const dropdown = menuItem.querySelector(
 					'.wp-block-megamenu-item__dropdown'
 				);
-
 				if ( dropdown ) {
-					dropdown.style.left = '0';
-					dropdown.style.removeProperty( 'max-width' );
+					( dropdown as HTMLElement ).style.cssText =
+						'left: 0; max-width: unset;';
 				}
 			} );
 			return;
 		}
 
 		const megamenuRect = this.megamenu.getBoundingClientRect();
-
-		// the max width of the dropdown menu, 0 to fit the screen
 		const dropdownMaxWidth =
 			Number( this.megamenu.dataset.dropdownWidth ) || 0;
 
-		this.menuItems.forEach( ( menuItem ) => {
+		for ( const menuItem of this.menuItems ) {
 			const dropdown: HTMLElement | null = menuItem.querySelector(
 				'.wp-block-megamenu-item__dropdown'
 			);
 
-			if ( dropdown ) {
-				delay( 310 ).then( () => {
-					// The fullwidth dropdown
-					if (
-						this.megamenu.classList.contains(
-							'has-full-width-dropdown'
-						)
-					) {
-						dropdown.style.left = '0';
-						setNewPosition(
-							dropdown,
-							calcNewPosition(
-								{ width: document.body.clientWidth, x: 0 },
-								dropdown.getBoundingClientRect(),
-								document.body.clientWidth
-							)
-						);
-					} else {
-						// the custom width dropdown
-						const dropdownRect = dropdown.getBoundingClientRect();
-						setNewPosition(
-							dropdown,
-							calcNewPosition(
-								megamenuRect,
-								dropdownRect,
-								dropdownMaxWidth
-							)
-						);
-					}
-				} );
+			if ( ! dropdown ) {
+				continue;
 			}
-		} );
+
+			await delay( 310 );
+
+			if (
+				this.megamenu.classList.contains( 'has-full-width-dropdown' )
+			) {
+				( dropdown as HTMLElement ).style.cssText = 'left: 0;';
+				setNewPosition(
+					dropdown,
+					calcNewPosition(
+						{ width: document.body.clientWidth, x: 0 },
+						dropdown.getBoundingClientRect(),
+						document.body.clientWidth
+					)
+				);
+			} else {
+				const dropdownRect = dropdown.getBoundingClientRect();
+				setNewPosition(
+					dropdown,
+					calcNewPosition(
+						megamenuRect,
+						dropdownRect,
+						dropdownMaxWidth
+					)
+				);
+			}
+		}
 	}
 
 	/**
